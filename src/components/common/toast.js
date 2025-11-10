@@ -90,5 +90,5 @@ export function showToast({ type, message }) {
 
   toastCloseBtn?.addEventListener("click", dismiss);
 
-  setTimeout(dismiss, 5000);
+  setTimeout(dismiss, 3000);
 }
