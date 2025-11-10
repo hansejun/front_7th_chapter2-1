@@ -27,6 +27,7 @@ export class HomePage extends BaseComponent {
       isFetching: true,
       params: defaultParams,
       hasNext: true,
+      cartItems: new Set(),
     };
     this.observer = null;
   }
@@ -63,7 +64,7 @@ export class HomePage extends BaseComponent {
     if (this.state.error) {
       return html`
         <div class="bg-gray-50">
-          ${Header({ cartCount: 4 })}
+          ${Header({ cartCount: 0 })}
           <main class="max-w-md mx-auto px-4 py-4">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4 text-center">
               <h3 class="text-lg font-semibold text-gray-900 mb-2">상품을 불러올 수 없습니다</h3>
@@ -82,7 +83,7 @@ export class HomePage extends BaseComponent {
     }
 
     const {
-      params: { category1, category2, limit, sort },
+      params: { category1, category2, limit, sort, search },
       products,
       isFetching,
       hasNext,
@@ -90,12 +91,12 @@ export class HomePage extends BaseComponent {
 
     return html`
       <div class="bg-gray-50">
-        ${Header({ cartCount: 4 })}
+        ${Header({ cartCount: this.state.cartItems.size })}
 
         <main class="max-w-md mx-auto px-4 py-4">
           <!-- 검색 및 필터 -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-            <div class="mb-4">${SearchBar()}</div>
+            <div class="mb-4">${SearchBar({ search })}</div>
             <div class="space-y-3">
               ${CategoryFilter({ category1, category2 })}
               <div class="flex gap-2 items-center justify-between">
@@ -110,12 +111,6 @@ export class HomePage extends BaseComponent {
         ${Footer()}
       </div>
     `;
-  }
-
-  /** 장바구니 상품 추가 */
-  onClickAddToCart(productId) {
-    console.log(productId);
-    alert("장바구니에 추가되었습니다");
   }
 
   /** 다음 페이지 데이터 로드 */
@@ -209,6 +204,21 @@ export class HomePage extends BaseComponent {
           params: { ...this.state.params, sort, page: 1 },
         });
         this.init();
+      }
+    });
+
+    // 4. 장바구니 상품 추가 이벤트
+    this.el.addEventListener("click", (e) => {
+      if (e.target.classList.contains("add-to-cart-btn")) {
+        const productId = e.target.dataset.productId;
+
+        if (this.state.cartItems.has(productId)) return;
+
+        this.setState({
+          cartItems: this.state.cartItems.add(productId),
+        });
+
+        showToast({ type: "success", message: "장바구니에 추가되었습니다" });
       }
     });
   }
