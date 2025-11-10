@@ -10,21 +10,18 @@ import { HomePageSkeleton } from "./HomePageSkeleton";
 import { html } from "../../utils/html";
 import { ProductList } from "../../components/product/ProductList";
 import { showToast } from "../../components/common/toast";
-const defaultParams = {
-  limit: 20,
-  search: "",
-  category1: "",
-  category2: "",
-  sort: "price_asc",
-};
+import { ProductListQueryParams } from "../../utils/query-params";
+
 export class HomePage extends BaseComponent {
   constructor(props = {}) {
     super(props);
+
+    this.queryParams = new ProductListQueryParams();
+
     this.state = {
       products: [],
       isLoading: true,
       isFetching: true,
-      params: defaultParams,
       pagination: {
         page: 1,
         hasNext: true,
@@ -36,7 +33,9 @@ export class HomePage extends BaseComponent {
 
   async init() {
     try {
-      const response = await getProducts(this.state.params);
+      const queryParams = new ProductListQueryParams();
+      const { page } = this.state.pagination;
+      const response = await getProducts({ ...queryParams.getQueryParams(), page });
 
       this.setState({
         products: response.products,
@@ -84,8 +83,10 @@ export class HomePage extends BaseComponent {
       `;
     }
 
+    const { category1, category2, limit, sort } = this.queryParams.getQueryParams();
+    console.log(category1, category2, limit, sort);
+
     const {
-      params: { category1, category2, limit, sort },
       products,
       isFetching,
       pagination: { hasNext },
@@ -119,12 +120,14 @@ export class HomePage extends BaseComponent {
   async fetchNextPage() {
     if (this.state.isFetching || !this.state.pagination.hasNext) return;
 
+    const nextPage = this.state.pagination.page + 1;
+
     this.setState({
       isFetching: true,
-      pagination: { ...this.state.pagination, page: this.state.pagination.page + 1 },
+      pagination: { ...this.state.pagination, page: nextPage },
     });
 
-    const response = await getProducts({ ...this.state.params });
+    const response = await getProducts({ ...this.queryParams.getQueryParams(), page: nextPage });
 
     this.setState({
       products: [...this.state.products, ...response.products],
@@ -168,9 +171,22 @@ export class HomePage extends BaseComponent {
     }
   }
 
+  handlePopState() {
+    this.init();
+  }
+
   mount(selector) {
     super.mount(selector);
+    window.addEventListener("popstate", this.handlePopState);
     this.init();
+  }
+
+  unmount() {
+    window.removeEventListener("popstate", this.handlePopState);
+
+    if (this.observer) {
+      this.observer.disconnect();
+    }
   }
 
   /** 렌더가 발생할 때마다 Observer가 바라보고 있는 요소를 다시 관찰하도록 설정 */
@@ -192,12 +208,13 @@ export class HomePage extends BaseComponent {
     // 2. 상품 limit 변경 이벤트
     this.el.addEventListener("change", (e) => {
       if (e.target.id === "limit-select") {
-        const limit = e.target.value;
+        const limit = Number(e.target.value);
 
+        this.queryParams.updateQueryParams({ limit });
         this.setState({
-          params: { ...this.state.params, limit: Number(limit) },
           pagination: { ...this.state.pagination, page: 1 },
         });
+
         this.init();
       }
     });
@@ -207,8 +224,8 @@ export class HomePage extends BaseComponent {
       if (e.target.id === "sort-select") {
         const sort = e.target.value;
 
+        this.queryParams.updateQueryParams({ sort });
         this.setState({
-          params: { ...this.state.params, sort },
           pagination: { ...this.state.pagination, page: 1 },
         });
         this.init();
@@ -236,8 +253,8 @@ export class HomePage extends BaseComponent {
 
       const search = e.target.value;
 
+      this.queryParams.updateQueryParams({ search });
       this.setState({
-        params: { ...this.state.params, search },
         pagination: { ...this.state.pagination, page: 1 },
       });
 
@@ -248,10 +265,12 @@ export class HomePage extends BaseComponent {
     this.el.addEventListener("click", (e) => {
       if (e.target.classList.contains("category1-filter-btn")) {
         const category1 = e.target.dataset.category1;
+
+        this.queryParams.updateQueryParams({ category1 });
         this.setState({
-          params: { ...this.state.params, category1 },
           pagination: { ...this.state.pagination, page: 1 },
         });
+
         this.init();
       }
     });
@@ -260,8 +279,9 @@ export class HomePage extends BaseComponent {
     this.el.addEventListener("click", (e) => {
       if (e.target.classList.contains("category2-filter-btn")) {
         const category2 = e.target.dataset.category2;
+
+        this.queryParams.updateQueryParams({ category2 });
         this.setState({
-          params: { ...this.state.params, category2 },
           pagination: { ...this.state.pagination, page: 1 },
         });
         this.init();
@@ -271,16 +291,15 @@ export class HomePage extends BaseComponent {
     // 6-3. 브레드크럼 클릭 이벤트
     this.el.addEventListener("click", (e) => {
       if (e.target.dataset.breadcrumb === "reset") {
+        this.queryParams.updateQueryParams({ category1: null, category2: null });
         this.setState({
-          params: { ...this.state.params, category1: null, category2: null },
           pagination: { ...this.state.pagination, page: 1 },
         });
         this.init();
       }
       if (e.target.dataset.breadcrumb === "category1") {
-        const category1 = e.target.dataset.category1;
+        this.queryParams.updateQueryParams({ category2: null });
         this.setState({
-          params: { ...this.state.params, category1, category2: null },
           pagination: { ...this.state.pagination, page: 1 },
         });
         this.init();
