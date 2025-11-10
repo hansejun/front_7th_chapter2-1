@@ -83,7 +83,7 @@ export class HomePage extends BaseComponent {
     }
 
     const {
-      params: { category1, category2, limit, sort, search },
+      params: { category1, category2, limit, sort },
       products,
       isFetching,
       hasNext,
@@ -96,7 +96,7 @@ export class HomePage extends BaseComponent {
         <main class="max-w-md mx-auto px-4 py-4">
           <!-- 검색 및 필터 -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-            <div class="mb-4">${SearchBar({ search })}</div>
+            <div class="mb-4">${SearchBar()}</div>
             <div class="space-y-3">
               ${CategoryFilter({ category1, category2 })}
               <div class="flex gap-2 items-center justify-between">
@@ -220,6 +220,19 @@ export class HomePage extends BaseComponent {
 
         showToast({ type: "success", message: "장바구니에 추가되었습니다" });
       }
+    });
+
+    // 5. 검색 이벤트
+    this.el.addEventListener("keydown", (e) => {
+      if (e.target.id !== "search-input" || e.key !== "Enter") return;
+
+      const search = e.target.value;
+
+      this.setState({
+        params: { ...this.state.params, search, page: 1 },
+      });
+
+      this.init();
     });
   }
 }
