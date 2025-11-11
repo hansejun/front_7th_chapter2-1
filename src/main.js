@@ -1,5 +1,6 @@
 import "./globals/html-global.js";
 import { HomePage } from "./pages/home/HomePage.js";
+import { modalStore } from "./stores/modal-store.js";
 
 const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) =>
@@ -10,6 +11,7 @@ const enableMocking = () =>
 
 function main() {
   new HomePage().mount("#root");
+  modalStore.init();
 }
 
 // 애플리케이션 시작
