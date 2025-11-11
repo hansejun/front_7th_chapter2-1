@@ -25,28 +25,20 @@ class CartStore {
   }
 
   init() {
-    try {
-      const cartStorage = LocalStorage.get(CART_STORAGE_KEY) || {
-        cartItems: [],
-        selectedItemIds: [],
-      };
-      const { cartItems, selectedItemIds } = cartStorage;
-      this.cartItems = cartItems;
-      this.selectedItemIds = selectedItemIds;
-    } catch (error) {
-      console.error("카트 스토리지 초기화 실패", error);
-    }
+    const cartStorage = LocalStorage.get(CART_STORAGE_KEY) || {
+      cartItems: [],
+      selectedItemIds: [],
+    };
+    const { cartItems, selectedItemIds } = cartStorage;
+    this.cartItems = cartItems ?? [];
+    this.selectedItemIds = selectedItemIds ?? [];
   }
 
   saveToStorage() {
-    try {
-      LocalStorage.set(CART_STORAGE_KEY, {
-        cartItems: this.cartItems,
-        selectedItemIds: this.selectedItemIds,
-      });
-    } catch (error) {
-      console.error("카트 스토리지 저장 실패", error);
-    }
+    LocalStorage.set(CART_STORAGE_KEY, {
+      cartItems: this.cartItems,
+      selectedItemIds: this.selectedItemIds,
+    });
   }
 
   getItems() {
