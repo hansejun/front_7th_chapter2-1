@@ -1,10 +1,10 @@
-import { BaseComponent } from "../common/BaseComponent";
+import { BaseComponent } from "../../core/component/BaseComponent";
 import { cartStore } from "../../stores/cart-store";
 import { html } from "../../utils/html";
 
 import { EmptyCart } from "./EmptyCart";
 import { CartItem } from "./CartItem";
-import { showToast } from "../common/toast";
+import { showToast } from "../../utils/toast";
 
 export class CartModal extends BaseComponent {
   constructor() {
