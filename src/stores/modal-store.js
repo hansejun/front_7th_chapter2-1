@@ -1,5 +1,3 @@
-import { CartModal } from "../components/cart/CartModal";
-
 class ModalStore {
   constructor() {
     this.modals = new Map();
@@ -14,8 +12,8 @@ class ModalStore {
     this.events();
   }
 
-  register(name, modal) {
-    this.modals.set(name, modal);
+  register(name, ModalClass) {
+    this.modals.set(name, ModalClass);
   }
 
   createPortal() {
@@ -36,33 +34,28 @@ class ModalStore {
   }
 
   open(name) {
-    if (this.currentOpenModal === name) {
-      return;
-    }
+    if (this.currentOpenModal?.name === name) return;
 
-    const modal = this.modals.get(name);
+    const ModalClass = this.modals.get(name);
+    if (!ModalClass) throw new Error(`"모달이 등록되어 있지 않습니다.`);
 
-    if (!modal) {
-      throw new Error("모달 없음");
-    }
+    // 모달 인스턴스 생성
+    const modalInstance = new ModalClass(this.portal);
 
-    this.currentOpenModal = modal;
+    this.currentOpenModal = { name, instance: modalInstance };
     this.portal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
-
-    this.currentOpenModal.mount("#modal-portal");
+    modalInstance.mount("#modal-portal");
   }
 
   close() {
-    if (!this.currentOpenModal) {
-      throw new Error("모달 없음");
-    }
+    if (!this.currentOpenModal) return;
 
+    const { instance } = this.currentOpenModal;
     this.portal.classList.add("hidden");
     document.body.style.overflow = "auto";
-    this.portal.removeChild(this.portal.lastChild);
-    this.currentOpenModal.unmount();
-
+    instance.unmount?.();
+    this.portal.innerHTML = "";
     this.currentOpenModal = null;
   }
 
@@ -96,5 +89,3 @@ class ModalStore {
 }
 
 export const modalStore = new ModalStore();
-
-modalStore.register("cart", new CartModal());
