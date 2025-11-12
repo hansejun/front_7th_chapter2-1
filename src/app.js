@@ -1,18 +1,17 @@
+import { Component } from "./core/component/Component";
 import { Router } from "./core/router/router";
+import { routes } from "./routes/routes";
 
-export class App {
-  constructor(selector = "#root", routes) {
-    this.root = document.querySelector(selector);
-
-    this.render();
-
-    this.router = new Router({
-      outlet: "#app",
-      routes,
-    });
+export class App extends Component {
+  constructor($target) {
+    super($target);
   }
 
-  render() {
-    this.root.innerHTML = html`<div id="app"></div>`;
+  setup() {
+    this.router = new Router(this.$target, routes);
+  }
+
+  template() {
+    return html`<div id="app"></div>`;
   }
 }

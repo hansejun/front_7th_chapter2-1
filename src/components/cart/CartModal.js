@@ -1,14 +1,13 @@
-import { BaseComponent } from "../../core/component/BaseComponent";
 import { cartStore } from "../../stores/cart-store";
 import { html } from "../../utils/html";
 
 import { EmptyCart } from "./EmptyCart";
 import { CartItem } from "./CartItem";
 import { showToast } from "../../utils/toast";
+import { Component } from "../../core/component/Component";
 
-export class CartModal extends BaseComponent {
-  constructor() {
-    super();
+export class CartModal extends Component {
+  setup() {
     this.update = () => this.render();
   }
 
@@ -18,61 +17,54 @@ export class CartModal extends BaseComponent {
 
   // 수량 증가
   handleIncreaseQuantity(e) {
-    if (!e.target.closest(".quantity-increase-btn")) return;
-    const productId = e.target.closest(".quantity-increase-btn").dataset.productId;
+    const productId = e.target.dataset.productId;
     cartStore.addQuantity(productId);
   }
 
   // 수량 감소
   handleDecreaseQuantity(e) {
-    if (!e.target.closest(".quantity-decrease-btn")) return;
-    const productId = e.target.closest(".quantity-decrease-btn").dataset.productId;
+    const productId = e.target.dataset.productId;
     cartStore.minusQuantity(productId);
   }
 
   // 체크박스 클릭
   handleToggleSelectItem(e) {
-    if (!e.target.closest(".cart-item-checkbox")) return;
-    const productId = e.target.closest(".cart-item-checkbox").dataset.productId;
+    const productId = e.target.dataset.productId;
     cartStore.toggleSelectItem(productId);
   }
 
   // 전체 선택
-  handleToggleSelectAll(e) {
-    if (!e.target.closest("#cart-modal-select-all-checkbox")) return;
+  handleToggleSelectAll() {
     cartStore.toggleSelectAll();
   }
 
   // 아이템 삭제
   handleRemoveItem(e) {
-    if (!e.target.closest(".cart-item-remove-btn")) return;
-    const productId = e.target.closest(".cart-item-remove-btn").dataset.productId;
+    const productId = e.target.dataset.productId;
     cartStore.removeItem(productId);
     showToast({ type: "info", message: "상품이 삭제되었습니다" });
   }
 
   // 선택한 상품 삭제
-  handleRemoveSelectedItems(e) {
-    if (!e.target.closest("#cart-modal-remove-selected-btn")) return;
+  handleRemoveSelectedItems() {
     cartStore.removeSelectedItems();
     showToast({ type: "info", message: "선택된 상품들이 삭제되었습니다" });
   }
 
   // 장바구니 전체 비우기
-  handleClearCart(e) {
-    if (!e.target.closest("#cart-modal-clear-cart-btn")) return;
+  handleClearCart() {
     cartStore.clearCart();
     showToast({ type: "info", message: "장바구니가 비워졌습니다" });
   }
 
-  events() {
-    this.el.addEventListener("click", this.handleIncreaseQuantity);
-    this.el.addEventListener("click", this.handleDecreaseQuantity);
-    this.el.addEventListener("click", this.handleRemoveItem);
-    this.el.addEventListener("change", this.handleToggleSelectItem);
-    this.el.addEventListener("change", this.handleToggleSelectAll);
-    this.el.addEventListener("click", this.handleRemoveSelectedItems);
-    this.el.addEventListener("click", this.handleClearCart);
+  setEvents() {
+    this.addEventListener("click", ".quantity-increase-btn", this.handleIncreaseQuantity);
+    this.addEventListener("click", ".quantity-decrease-btn", this.handleDecreaseQuantity);
+    this.addEventListener("click", ".cart-item-remove-btn", this.handleRemoveItem);
+    this.addEventListener("change", ".cart-item-checkbox", this.handleToggleSelectItem);
+    this.addEventListener("change", '[id="cart-modal-select-all-checkbox"]', this.handleToggleSelectAll);
+    this.addEventListener("click", '[id="cart-modal-remove-selected-btn"]', this.handleRemoveSelectedItems);
+    this.addEventListener("click", '[id="cart-modal-clear-cart-btn"]', this.handleClearCart);
   }
 
   mount(selector) {
@@ -81,14 +73,8 @@ export class CartModal extends BaseComponent {
   }
 
   unmount() {
+    super.unmount();
     cartStore.unsubscribe(this.update);
-    this.el.removeEventListener("click", this.handleIncreaseQuantity);
-    this.el.removeEventListener("click", this.handleDecreaseQuantity);
-    this.el.removeEventListener("click", this.handleRemoveItem);
-    this.el.removeEventListener("change", this.handleToggleSelectItem);
-    this.el.removeEventListener("change", this.handleToggleSelectAll);
-    this.el.removeEventListener("click", this.handleRemoveSelectedItems);
-    this.el.removeEventListener("click", this.handleClearCart);
   }
 
   template() {
