@@ -12,6 +12,7 @@ import { ProductList } from "../../components/product/ProductList";
 import { showToast } from "../../utils/toast";
 import { cartStore } from "../../stores/cart-store";
 import { searchParamsStore } from "../../stores/search-params-store";
+import { Router } from "../../core/router/router";
 
 export class HomePage extends Component {
   constructor(props = {}) {
@@ -293,6 +294,13 @@ export class HomePage extends Component {
       this.setState({
         pagination: { ...this.state.pagination, page: 1 },
       });
+    });
+
+    // 7. 상품 클릭 이벤트
+    this.addEventListener("click", ".product-card", (e) => {
+      const productId = e.target.closest(".product-card").dataset.productId;
+
+      Router.getInstance().push(`/product/${productId}`);
     });
   }
 }
