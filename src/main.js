@@ -1,6 +1,6 @@
 import { App } from "./app.js";
+import { CartModal } from "./components/cart/CartModal.js";
 import "./globals/html-global.js";
-import { routes } from "./routes/routes.js";
 import { modalStore } from "./stores/modal-store.js";
 
 const enableMocking = () =>
@@ -11,8 +11,11 @@ const enableMocking = () =>
   );
 
 function main() {
-  new App("#root", routes);
+  const $root = document.querySelector("#root");
+  new App($root);
+
   modalStore.init();
+  modalStore.register("cart", CartModal);
 }
 
 // 애플리케이션 시작

@@ -1,19 +1,40 @@
 export class Router {
-  constructor({ routes, outlet = "#app" }) {
+  static _instance = null;
+
+  constructor($target, routes) {
+    if (Router._instance) return Router._instance;
+
+    this.$target = $target;
     this.routes = routes;
-    this.outlet = document.querySelector(outlet);
+    this.currentComponent = null;
+    Router._instance = this;
     this.init();
   }
 
+  static getInstance() {
+    return Router._instance;
+  }
+
   init() {
+    // 브라우저 뒤/앞 이동 시 라우트 재실행
     window.addEventListener("popstate", () => this.route());
+
+    // Link 컴포넌트
     document.addEventListener("click", (e) => {
-      if (e.target.matches("[data-link]")) {
-        e.preventDefault();
-        history.pushState(null, null, e.target.href);
-        this.route();
-      }
+      const link = e.target.closest("[data-link]");
+      if (!link) return;
+
+      e.preventDefault();
+      const href = link.getAttribute("href");
+      history.pushState(null, "", href);
+      this.route();
     });
+
+    this.route();
+  }
+
+  push(path) {
+    history.pushState(null, "", path);
     this.route();
   }
 
@@ -21,13 +42,11 @@ export class Router {
     for (const route of this.routes) {
       const paramNames = [];
 
-      // :param 패턴과 * 와일드카드를 모두 처리
-      const regexPath = route.path
-        .replace(/\*/g, ".*") // * → .* (와일드카드)
-        .replace(/:([^/]+)/g, (_, key) => {
-          paramNames.push(key);
-          return "([^/]+)"; // :param → 캡처 그룹
-        });
+      // 경로 매칭
+      const regexPath = route.path.replace(/\*/g, ".*").replace(/:([^/]+)/g, (_, key) => {
+        paramNames.push(key);
+        return "([^/]+)";
+      });
 
       const regex = new RegExp(`^${regexPath}$`);
       const match = pathname.match(regex);
@@ -45,10 +64,21 @@ export class Router {
 
   route() {
     const pathname = location.pathname;
-    const match = this.matchRoute(pathname);
-    if (match) {
-      const component = new match.component(match.params);
-      component.mount("#app"); // FIXME:
+    const matched = this.matchRoute(pathname);
+
+    // 현재 컴포넌트 언마운트
+    if (this.currentComponent?.unmount) {
+      this.currentComponent.unmount();
+    }
+
+    this.$target.innerHTML = "";
+
+    if (matched) {
+      const PageComponent = matched.component;
+      console.log(this.$target);
+      this.currentComponent = new PageComponent(this.$target, matched.params);
     }
   }
 }
+
+export const router = Router.getInstance();
