@@ -77,15 +77,13 @@ export class HomePage extends Component {
   renderComponents() {
     if (this.state.error) {
       const errorFallback = this.$target.querySelector('[data-component="home-page-error-fallback"]');
-      this.errorFallback = new HomePageErrorFallback(errorFallback, {
-        handleRetry: () => this.vm.handleRetry(),
-      });
+      new HomePageErrorFallback(errorFallback, { handleRetry: this.vm.handleRetry.bind(this) });
       return;
     }
 
     if (this.state.isLoading) {
       const loadingFallback = this.$target.querySelector('[data-component="home-page-loading-fallback"]');
-      this.loadingFallback = new HomePageLoadingFallback(loadingFallback);
+      new HomePageLoadingFallback(loadingFallback);
       return;
     }
 
@@ -99,12 +97,11 @@ export class HomePage extends Component {
     const sortSelect = this.$target.querySelector('[data-component="home-page-sort-select"]');
     const productList = this.$target.querySelector('[data-component="home-page-product-list"]');
 
-    this.searchBar = new SearchBar(searchBar, {
-      search,
-      onSearch: this.vm.handleSearch.bind(this),
-    });
+    new SearchBar(searchBar, { search, onSearch: this.vm.handleSearch.bind(this) });
+    new LimitSelect(limitSelect, { limit, onLimitChange: this.vm.handleLimitChange.bind(this) });
+    new SortSelect(sortSelect, { sort, onSortChange: this.vm.handleSortChange.bind(this) });
 
-    this.categoryFilter = new CategoryFilter(categoryFilter, {
+    new CategoryFilter(categoryFilter, {
       category1,
       category2,
       onCategory1Click: this.vm.handleCategory1Click.bind(this),
@@ -113,17 +110,7 @@ export class HomePage extends Component {
       onResetFilter: this.vm.handleResetFilter.bind(this),
     });
 
-    this.limitSelect = new LimitSelect(limitSelect, {
-      limit,
-      onLimitChange: this.vm.handleLimitChange.bind(this),
-    });
-
-    this.sortSelect = new SortSelect(sortSelect, {
-      sort,
-      onSortChange: this.vm.handleSortChange.bind(this),
-    });
-
-    this.productList = new ProductList(productList, {
+    new ProductList(productList, {
       products,
       isFetching,
       hasNext,

@@ -69,6 +69,7 @@ export function showToast({ type, message }) {
     document.body.appendChild(container);
   }
 
+  container.innerHTML = "";
   const wrapper = document.createElement("div");
   wrapper.innerHTML = Toast({ type, message });
   const toast = wrapper.firstElementChild;
