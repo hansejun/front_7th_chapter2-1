@@ -1,6 +1,30 @@
-export function Header({ cartCount }) {
-  return html`
-    <header class="bg-white shadow-sm sticky top-0 z-40">
+import { Component } from "../../core/component/Component";
+import { cartStore } from "../../stores/cart-store";
+import { modalStore } from "../../stores/modal-store";
+
+export class Header extends Component {
+  setup() {
+    this.boundRender = () => this.render();
+
+    this.useEffect(() => {
+      cartStore.subscribe(this.boundRender);
+      return () => {
+        cartStore.unsubscribe(this.boundRender);
+      };
+    }, []);
+  }
+
+  setEvents() {
+    document.addEventListener("click", (event) => {
+      if (event.target.closest("#cart-icon-btn")) {
+        modalStore.open("cart");
+      }
+    });
+  }
+
+  template() {
+    const cartCount = cartStore.getItemsSize();
+    return html`
       <div class="max-w-md mx-auto px-4 py-4">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-bold text-gray-900">
@@ -29,6 +53,6 @@ export function Header({ cartCount }) {
           </div>
         </div>
       </div>
-    </header>
-  `;
+    `;
+  }
 }

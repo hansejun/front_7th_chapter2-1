@@ -2,8 +2,6 @@ import { CategoryFilter } from "../../components/filter/CategoryFilter";
 import { LimitSelect } from "../../components/filter/LimitSelect";
 import { SearchBar } from "../../components/filter/SearchBar";
 import { SortSelect } from "../../components/filter/SortSelect";
-import { Header } from "../../components/layout/Header";
-import { Footer } from "../../components/layout/Footer";
 import { Component } from "../../core/component/Component";
 import { HomePageSkeleton } from "./HomePageSkeleton";
 import { html } from "../../utils/html";
@@ -74,22 +72,18 @@ export class HomePage extends Component {
 
     if (this.state.error) {
       return html`
-        <div class="bg-gray-50">
-          ${Header({ cartCount: 0 })}
-          <main class="max-w-md mx-auto px-4 py-4">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4 text-center">
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">상품을 불러올 수 없습니다</h3>
-              <p class="text-gray-600 mb-4">네트워크 연결을 확인하고 다시 시도해주세요.</p>
-              <button
-                data-action="retry"
-                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
-              >
-                다시 시도
-              </button>
-            </div>
-          </main>
-          ${Footer()}
-        </div>
+        <main class="max-w-md mx-auto px-4 py-4">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4 text-center">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">상품을 불러올 수 없습니다</h3>
+            <p class="text-gray-600 mb-4">네트워크 연결을 확인하고 다시 시도해주세요.</p>
+            <button
+              data-action="retry"
+              class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              다시 시도
+            </button>
+          </div>
+        </main>
       `;
     }
 
@@ -102,26 +96,19 @@ export class HomePage extends Component {
     } = this.state;
 
     return html`
-      <div class="bg-gray-50">
-        ${Header({ cartCount: cartStore.getItemsSize() })}
-
-        <main class="max-w-md mx-auto px-4 py-4">
-          <!-- 검색 및 필터 -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-            <div class="mb-4">${SearchBar({ search: searchParamsStore.get().search })}</div>
-            <div class="space-y-3">
-              ${CategoryFilter({ category1, category2 })}
-              <div class="flex gap-2 items-center justify-between">
-                ${LimitSelect({ limit })} ${SortSelect({ sort })}
-              </div>
-            </div>
+      <main class="max-w-md mx-auto px-4 py-4">
+        <!-- 검색 및 필터 -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+          <div class="mb-4">${SearchBar({ search: searchParamsStore.get().search })}</div>
+          <div class="space-y-3">
+            ${CategoryFilter({ category1, category2 })}
+            <div class="flex gap-2 items-center justify-between">${LimitSelect({ limit })} ${SortSelect({ sort })}</div>
           </div>
+        </div>
 
-          <!-- 상품 목록 -->
-          ${ProductList({ products, isFetching, hasNext, total })}
-        </main>
-        ${Footer()}
-      </div>
+        <!-- 상품 목록 -->
+        ${ProductList({ products, isFetching, hasNext, total })}
+      </main>
     `;
   }
 

@@ -67,9 +67,15 @@ export class Router {
     this.$target.innerHTML = "";
 
     if (matched) {
-      const PageComponent = matched.component;
+      const { layout, component } = matched;
 
-      this.currentComponent = new PageComponent(this.$target);
+      if (layout) {
+        const LayoutComponent = layout;
+        this.currentComponent = new LayoutComponent(this.$target, { children: component });
+      } else {
+        const PageComponent = component;
+        this.currentComponent = new PageComponent(this.$target);
+      }
     }
   }
 

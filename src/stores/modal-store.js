@@ -63,12 +63,6 @@ class ModalStore {
   }
 
   events() {
-    document.addEventListener("click", (event) => {
-      if (event.target.closest("#cart-icon-btn")) {
-        this.open("cart");
-      }
-    });
-
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         this.close();
