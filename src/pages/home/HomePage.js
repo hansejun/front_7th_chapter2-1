@@ -3,20 +3,19 @@ import { LimitSelect } from "../../components/filter/LimitSelect";
 import { SearchBar } from "../../components/filter/SearchBar";
 import { SortSelect } from "../../components/filter/SortSelect";
 import { Component } from "../../core/component/Component";
-import { HomePageSkeleton } from "./HomePageSkeleton";
+import { HomePageLoadingFallback } from "./HomePageLoadingFallback";
 import { html } from "../../utils/html";
 import { ProductList } from "../../components/product/ProductList";
 import { cartStore } from "../../stores/cart-store";
 import { searchParamsStore } from "../../stores/search-params-store";
-import { useNavigate } from "../../hooks/useNavigate";
 
 import { IntersectionObserverWrapper } from "../../core/IntersectionObserver";
 import { HomeViewModel } from "./HomeViewModel";
+import { HomePageErrorFallback } from "./HomePageErrorFallback";
 
 export class HomePage extends Component {
   setup() {
     this.vm = new HomeViewModel();
-    this.navigate = useNavigate();
 
     this.state = this.vm.state;
 
@@ -65,100 +64,102 @@ export class HomePage extends Component {
     }
   }
 
+  render() {
+    super.render();
+    this.observeSentinel();
+    this.renderComponents();
+  }
+
+  unmount() {
+    super.unmount();
+  }
+
+  renderComponents() {
+    if (this.state.error) {
+      const errorFallback = this.$target.querySelector('[data-component="home-page-error-fallback"]');
+      this.errorFallback = new HomePageErrorFallback(errorFallback, {
+        handleRetry: () => this.vm.handleRetry(),
+      });
+      return;
+    }
+
+    if (this.state.isLoading) {
+      const loadingFallback = this.$target.querySelector('[data-component="home-page-loading-fallback"]');
+      this.loadingFallback = new HomePageLoadingFallback(loadingFallback);
+      return;
+    }
+
+    const { category1 = null, category2 = null, limit = 20, sort = "price_asc", search = "" } = searchParamsStore.get();
+    const { products, isFetching, pagination } = this.state;
+    const { hasNext, total } = pagination;
+
+    const searchBar = this.$target.querySelector('[data-component="home-page-search-bar"]');
+    const categoryFilter = this.$target.querySelector('[data-component="home-page-category-filter"]');
+    const limitSelect = this.$target.querySelector('[data-component="home-page-limit-select"]');
+    const sortSelect = this.$target.querySelector('[data-component="home-page-sort-select"]');
+    const productList = this.$target.querySelector('[data-component="home-page-product-list"]');
+
+    this.searchBar = new SearchBar(searchBar, {
+      search,
+      onSearch: this.vm.handleSearch.bind(this),
+    });
+
+    this.categoryFilter = new CategoryFilter(categoryFilter, {
+      category1,
+      category2,
+      onCategory1Click: this.vm.handleCategory1Click.bind(this),
+      onCategory1Filter: this.vm.handleCategory1Filter.bind(this),
+      onCategory2Filter: this.vm.handleCategory2Filter.bind(this),
+      onResetFilter: this.vm.handleResetFilter.bind(this),
+    });
+
+    this.limitSelect = new LimitSelect(limitSelect, {
+      limit,
+      onLimitChange: this.vm.handleLimitChange.bind(this),
+    });
+
+    this.sortSelect = new SortSelect(sortSelect, {
+      sort,
+      onSortChange: this.vm.handleSortChange.bind(this),
+    });
+
+    this.productList = new ProductList(productList, {
+      products,
+      isFetching,
+      hasNext,
+      total,
+      onAddToCart: this.vm.handleAddToCart.bind(this),
+    });
+  }
+
   template() {
     if (this.state.isLoading) {
-      return HomePageSkeleton();
+      return html`<div data-component="home-page-loading-fallback"></div>`;
     }
 
     if (this.state.error) {
-      return html`
-        <main class="max-w-md mx-auto px-4 py-4">
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4 text-center">
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">상품을 불러올 수 없습니다</h3>
-            <p class="text-gray-600 mb-4">네트워크 연결을 확인하고 다시 시도해주세요.</p>
-            <button
-              data-action="retry"
-              class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
-            >
-              다시 시도
-            </button>
-          </div>
-        </main>
-      `;
+      console.log(this.state.error);
+      return html`<div data-component="home-page-error-fallback"></div>`;
     }
-
-    const { category1 = null, category2 = null, limit = 20, sort = "price_asc" } = searchParamsStore.get();
-
-    const {
-      products,
-      isFetching,
-      pagination: { hasNext, total },
-    } = this.state;
 
     return html`
       <main class="max-w-md mx-auto px-4 py-4">
         <!-- 검색 및 필터 -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-          <div class="mb-4">${SearchBar({ search: searchParamsStore.get().search })}</div>
+          <div class="mb-4" data-component="home-page-search-bar"></div>
           <div class="space-y-3">
-            ${CategoryFilter({ category1, category2 })}
-            <div class="flex gap-2 items-center justify-between">${LimitSelect({ limit })} ${SortSelect({ sort })}</div>
+            <div data-component="home-page-category-filter"></div>
+            <div class="flex gap-2 items-center justify-between">
+              <div data-component="home-page-limit-select"></div>
+              <div data-component="home-page-sort-select"></div>
+            </div>
           </div>
         </div>
 
         <!-- 상품 목록 -->
-        ${ProductList({ products, isFetching, hasNext, total })}
+        <div data-component="home-page-product-list"></div>
+        <div id="load-more-sentinel" class="h-10"></div>
       </main>
     `;
-  }
-
-  render() {
-    super.render();
-    this.observeSentinel();
-  }
-
-  setEvents() {
-    // 재시도 버튼 클릭 이벤트
-    this.addEventListener("click", '[data-action="retry"]', () => this.vm.handleRetry());
-
-    // 장바구니 추가 버튼 클릭 이벤트
-    this.addEventListener("click", ".add-to-cart-btn", (e) => this.vm.handleAddToCart(e.target.dataset.productId));
-
-    // 카테고리1 필터 버튼 클릭 이벤트
-    this.addEventListener("click", ".category1-filter-btn", (e) =>
-      this.vm.handleCategory1Filter(e.target.dataset.category1),
-    );
-
-    // 카테고리2 필터 버튼 클릭 이벤트
-    this.addEventListener("click", ".category2-filter-btn", (e) =>
-      this.vm.handleCategory2Filter(e.target.dataset.category2),
-    );
-
-    // 브래드크럼 전체 버튼 클릭 이벤트
-    this.addEventListener("click", '[data-breadcrumb="reset"]', () => this.vm.handleResetFilter());
-
-    // 브래드크럼 1depth 카테고리 버튼 클릭 이벤트
-    this.addEventListener("click", '[data-breadcrumb="category1"]', () => this.vm.handleCategory1Click());
-
-    // 상품 카드 클릭 이벤트
-    this.addEventListener("click", ".product-card", (e) => {
-      if (e.target.closest(".add-to-cart-btn")) return;
-      const productId = e.target.closest(".product-card").dataset.productId;
-
-      this.navigate.push(`/product/${productId}`);
-    });
-
-    // 페이지당 상품 수 변경 이벤트
-    this.addEventListener("change", '[id="limit-select"]', (e) => this.vm.handleLimitChange(Number(e.target.value)));
-
-    // 정렬 변경 이벤트
-    this.addEventListener("change", '[id="sort-select"]', (e) => this.vm.handleSortChange(e.target.value));
-
-    // 검색 입력 이벤트
-    this.addEventListener("keydown", '[id="search-input"]', (e) => {
-      if (e.key === "Enter") {
-        this.vm.handleSearch(e.target.value);
-      }
-    });
   }
 }

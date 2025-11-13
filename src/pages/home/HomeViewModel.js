@@ -53,6 +53,7 @@ export class HomeViewModel {
         products: response.products,
         isLoading: false,
         isFetching: false,
+        error: null,
         pagination: {
           ...response.pagination,
         },

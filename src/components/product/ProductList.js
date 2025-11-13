@@ -1,9 +1,28 @@
+import { Component } from "../../core/component/Component";
+import { useNavigate } from "../../hooks/useNavigate";
 import { ProductCard } from "./ProductCard";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 
-export function ProductList({ products, isFetching, hasNext, total }) {
-  return html` <div class="mb-6">
-    <div>
+export class ProductList extends Component {
+  setup() {
+    this.navigate = useNavigate();
+  }
+
+  setEvents() {
+    this.addEventListener("click", ".product-card", (e) => {
+      if (e.target.closest(".add-to-cart-btn")) return;
+
+      const productId = e.target.closest(".product-card").dataset.productId;
+      this.navigate.push(`/product/${productId}`);
+    });
+
+    this.addEventListener("click", ".add-to-cart-btn", (e) => this.props.onAddToCart(e.target.dataset.productId));
+  }
+
+  template() {
+    const { products, isFetching, hasNext, total } = this.props;
+    return html`
+     <div>
       <!-- 상품 개수 정보 -->
       <div class="mb-4 text-sm text-gray-600">총 <span class="font-medium text-gray-900">${total}개</span>의 상품</div>
       <!-- 상품 그리드 -->
@@ -13,8 +32,9 @@ export function ProductList({ products, isFetching, hasNext, total }) {
 
       ${isFetching ? LoadingMore() : ""} ${!hasNext ? NoMoreProducts() : ""}
     </div>
-    <div id="load-more-sentinel" class="h-20"></div>
+  
   </div>`;
+  }
 }
 
 function LoadingMore() {
