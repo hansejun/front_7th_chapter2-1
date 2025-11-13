@@ -11,8 +11,9 @@ import { ProductList } from "../../components/product/ProductList";
 import { cartStore } from "../../stores/cart-store";
 import { searchParamsStore } from "../../stores/search-params-store";
 import { useNavigate } from "../../hooks/useNavigate";
-import { HomeViewModel } from "../../viewmodels/HomeViewModel";
+
 import { IntersectionObserverWrapper } from "../../core/IntersectionObserver";
+import { HomeViewModel } from "./HomeViewModel";
 
 export class HomePage extends Component {
   setup() {
@@ -59,7 +60,6 @@ export class HomePage extends Component {
     }, []);
   }
 
-  // sentinel 요소 관찰 시작
   observeSentinel() {
     const sentinel = this.$target.querySelector("#load-more-sentinel");
     if (sentinel) {

@@ -1,7 +1,7 @@
-import { getProducts } from "../api/productApi";
-import { cartStore } from "../stores/cart-store";
-import { searchParamsStore } from "../stores/search-params-store";
-import { showToast } from "../utils/toast";
+import { getProducts } from "../../api/productApi";
+import { cartStore } from "../../stores/cart-store";
+import { searchParamsStore } from "../../stores/search-params-store";
+import { showToast } from "../../utils/toast";
 
 export class HomeViewModel {
   constructor() {
