@@ -51,11 +51,30 @@ const Category2Buttons = ({ category1, category2 }) => {
   if (category1 === "생활/건강") {
     return html`
       <div class="flex flex-wrap gap-2">
-        <button data-category1="생활/건강" data-category2="생활용품" class="${style("생활용품")}">생활용품</button>
-        <button data-category1="생활/건강" data-category2="주방용품" class="${style("주방용품")}">주방용품</button>
-        <button data-category1="생활/건강" data-category2="문구/사무용품" class="${style("문구/사무용품")}">
-          문구/사무용품
-        </button>
+        ${[
+          "생활용품",
+          "주방용품",
+          "문구/사무용품",
+          "자동차용품",
+          "구강위생용품",
+          "수납/정리용품",
+          "욕실용품",
+          "세탁용품",
+          "공구",
+          "청소용품",
+          "정원/원예용품",
+          "수집품",
+          "관상어용품",
+          "반려동물",
+        ]
+          .map(
+            (category) => html`
+              <button data-category1="생활/건강" data-category2="${category}" class="${style(category)}">
+                ${category}
+              </button>
+            `,
+          )
+          .join("")}
       </div>
     `;
   }

@@ -27,6 +27,7 @@ export class HomePage extends Component {
       pagination: {
         page: 1,
         hasNext: true,
+        total: 0,
       },
     };
 
@@ -63,7 +64,11 @@ export class HomePage extends Component {
         products: response.products,
         isLoading: false,
         isFetching: false,
-        hasNext: response.pagination.hasNext,
+        pagination: {
+          ...this.state.pagination,
+          total: response.pagination.total,
+          hasNext: response.pagination.hasNext,
+        },
       });
     } catch (e) {
       this.setState({
@@ -108,7 +113,7 @@ export class HomePage extends Component {
     const {
       products,
       isFetching,
-      pagination: { hasNext },
+      pagination: { hasNext, total },
     } = this.state;
 
     return html`
@@ -118,7 +123,7 @@ export class HomePage extends Component {
         <main class="max-w-md mx-auto px-4 py-4">
           <!-- 검색 및 필터 -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-            <div class="mb-4">${SearchBar()}</div>
+            <div class="mb-4">${SearchBar({ search: searchParamsStore.get().search })}</div>
             <div class="space-y-3">
               ${CategoryFilter({ category1, category2 })}
               <div class="flex gap-2 items-center justify-between">
@@ -128,7 +133,7 @@ export class HomePage extends Component {
           </div>
 
           <!-- 상품 목록 -->
-          ${ProductList({ products, isFetching, hasNext })}
+          ${ProductList({ products, isFetching, hasNext, total })}
         </main>
         ${Footer()}
       </div>

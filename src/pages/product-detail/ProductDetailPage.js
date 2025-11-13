@@ -5,6 +5,7 @@ import { Component } from "../../core/component/Component";
 import { useNavigate } from "../../hooks/useNavigate";
 import { useParams } from "../../hooks/useParams";
 import { cartStore } from "../../stores/cart-store";
+import { formatPrice } from "../../utils/format";
 import { showToast } from "../../utils/toast";
 import { ProductDetailPageSkeleton } from "./ProductDetailPageSkeleton";
 
@@ -138,7 +139,7 @@ export class ProductDetailPage extends Component {
                 </div>
                 <!-- 가격 -->
                 <div class="mb-4">
-                  <span class="text-2xl font-bold text-blue-600">${lprice}원</span>
+                  <span class="text-2xl font-bold text-blue-600">${formatPrice(lprice)}</span>
                 </div>
                 <!-- 재고 -->
                 <div class="text-sm text-gray-600 mb-4">재고 ${stock}개</div>
@@ -224,7 +225,7 @@ export class ProductDetailPage extends Component {
                           />
                         </div>
                         <h3 class="text-sm font-medium text-gray-900 mb-1 line-clamp-2">${product.title}</h3>
-                        <p class="text-sm font-bold text-blue-600">${product.lprice}원</p>
+                        <p class="text-sm font-bold text-blue-600">${formatPrice(product.lprice)}</p>
                       </div>`,
                   )
                   .join("")}

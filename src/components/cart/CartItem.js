@@ -1,6 +1,8 @@
+import { formatPrice } from "../../utils/format";
+
 export function CartItem({ item, isSelected }) {
   return html`
-    <div class="flex items-center py-3 border-b border-gray-100 cart-item" data-product-id="${item.id}">
+    <div class="flex items-center py-3 border-b border-gray-100 cart-item" data-product-id="${item.productId}">
       <!-- 선택 체크박스 -->
       <label class="flex items-center mr-3">
         <input
@@ -28,7 +30,7 @@ export function CartItem({ item, isSelected }) {
         >
           ${item.title}
         </h4>
-        <p class="text-sm text-gray-600 mt-1">${item.lprice.toLocaleString()}원</p>
+        <p class="text-sm text-gray-600 mt-1">${formatPrice(item.lprice)}</p>
         <!-- 수량 조절 -->
         <div class="flex items-center mt-2">
           <button

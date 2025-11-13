@@ -1,6 +1,6 @@
 import { LocalStorage } from "../utils/local-storage";
 
-const CART_STORAGE_KEY = "cart";
+const CART_STORAGE_KEY = "shopping_cart";
 
 class CartStore {
   constructor() {

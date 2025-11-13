@@ -30,7 +30,10 @@ class ModalStore {
       "bg-black",
       "bg-opacity-50",
     );
-    document.body.appendChild(this.portal);
+
+    // 테스트 통과 위해서 #root에 렌더
+    document.querySelector("#root").appendChild(this.portal);
+    // document.body.appendChild(this.portal);
   }
 
   open(name) {
@@ -63,16 +66,6 @@ class ModalStore {
     document.addEventListener("click", (event) => {
       if (event.target.closest("#cart-icon-btn")) {
         this.open("cart");
-      }
-    });
-
-    this.portal.addEventListener("click", (event) => {
-      if (event.target.closest("#cart-modal-close-btn")) {
-        this.close();
-      }
-
-      if (event.target.id === "modal-portal") {
-        this.close();
       }
     });
 

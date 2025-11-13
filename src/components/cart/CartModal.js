@@ -5,6 +5,8 @@ import { EmptyCart } from "./EmptyCart";
 import { CartItem } from "./CartItem";
 import { showToast } from "../../utils/toast";
 import { Component } from "../../core/component/Component";
+import { formatPrice } from "../../utils/format";
+import { modalStore } from "../../stores/modal-store";
 
 export class CartModal extends Component {
   setup() {
@@ -12,18 +14,18 @@ export class CartModal extends Component {
   }
 
   formatPrice(price) {
-    return `${price.toLocaleString()}원`;
+    return formatPrice(price);
   }
 
   // 수량 증가
   handleIncreaseQuantity(e) {
-    const productId = e.target.dataset.productId;
+    const productId = e.target.closest(".quantity-increase-btn").dataset.productId;
     cartStore.addQuantity(productId);
   }
 
   // 수량 감소
   handleDecreaseQuantity(e) {
-    const productId = e.target.dataset.productId;
+    const productId = e.target.closest(".quantity-decrease-btn").dataset.productId;
     cartStore.minusQuantity(productId);
   }
 
@@ -57,6 +59,17 @@ export class CartModal extends Component {
     showToast({ type: "info", message: "장바구니가 비워졌습니다" });
   }
 
+  handleCloseModal(e) {
+    // overlay를 직접 클릭한 경우에만 닫기
+    if (e.target.classList.contains("cart-modal-overlay")) {
+      modalStore.close();
+    }
+
+    if (e.target.closest("#cart-modal-close-btn")) {
+      modalStore.close();
+    }
+  }
+
   setEvents() {
     this.addEventListener("click", ".quantity-increase-btn", this.handleIncreaseQuantity);
     this.addEventListener("click", ".quantity-decrease-btn", this.handleDecreaseQuantity);
@@ -65,6 +78,8 @@ export class CartModal extends Component {
     this.addEventListener("change", '[id="cart-modal-select-all-checkbox"]', this.handleToggleSelectAll);
     this.addEventListener("click", '[id="cart-modal-remove-selected-btn"]', this.handleRemoveSelectedItems);
     this.addEventListener("click", '[id="cart-modal-clear-cart-btn"]', this.handleClearCart);
+    this.addEventListener("click", '[id="cart-modal-close-btn"]', this.handleCloseModal);
+    this.addEventListener("click", ".cart-modal-overlay", this.handleCloseModal);
   }
 
   mount(selector) {
@@ -90,9 +105,11 @@ export class CartModal extends Component {
     }
 
     return html`
-      <div class="flex min-h-full max-w-lg w-full items-end justify-center p-0 sm:items-center sm:p-4">
+      <div
+        class="flex min-h-full w-full cart-modal-overlay  w-full items-end justify-center p-0 sm:items-center sm:p-4"
+      >
         <div
-          class="relative bg-white rounded-t-lg sm:rounded-lg shadow-xl w-full max-w-md sm:max-w-l  g max-h-[90vh] overflow-hidden"
+          class="relative bg-white cart-modal rounded-t-lg sm:rounded-lg shadow-xl w-full max-w-md sm:max-w-l  g max-h-[90vh] overflow-hidden"
         >
           <!-- 헤더 -->
           <div class="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
