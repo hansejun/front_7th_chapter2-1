@@ -12,10 +12,10 @@ import { cartStore } from "../../stores/cart-store";
 import { searchParamsStore } from "../../stores/search-params-store";
 import { useNavigate } from "../../hooks/useNavigate";
 import { HomeViewModel } from "../../viewmodels/HomeViewModel";
+import { IntersectionObserverWrapper } from "../../core/IntersectionObserver";
 
 export class HomePage extends Component {
   setup() {
-    this.observer = null;
     this.vm = new HomeViewModel();
     this.navigate = useNavigate();
 
@@ -26,7 +26,20 @@ export class HomePage extends Component {
       this.render();
     });
 
-    this.createIntersectionObserver();
+    // IntersectionObserver 초기화
+    this.observer = new IntersectionObserverWrapper(
+      (entries) => {
+        const sentinel = entries[0];
+        if (sentinel.isIntersecting && this.vm.shouldLoadNextPage()) {
+          this.vm.fetchNextPage();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "100px",
+        threshold: 0.1,
+      },
+    );
 
     this.useEffect(() => {
       this.vm.init();
@@ -46,32 +59,12 @@ export class HomePage extends Component {
     }, []);
   }
 
-  // 옵저버 생성
-  createIntersectionObserver() {
-    this.observer = new IntersectionObserver(
-      (entries) => {
-        const sentinel = entries[0];
-
-        if (sentinel.isIntersecting && this.vm.shouldLoadNextPage()) {
-          this.vm.fetchNextPage();
-        }
-      },
-      {
-        root: null,
-        rootMargin: "100px",
-        threshold: 0.1,
-      },
-    );
-  }
-
-  // 옵저버 관찰
+  // sentinel 요소 관찰 시작
   observeSentinel() {
-    if (!this.observer) return;
     const sentinel = this.$target.querySelector("#load-more-sentinel");
-
-    if (!sentinel) return;
-
-    this.observer.observe(sentinel);
+    if (sentinel) {
+      this.observer.observe(sentinel);
+    }
   }
 
   template() {
