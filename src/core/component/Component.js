@@ -20,9 +20,11 @@ export class Component {
     this._isMounted = true;
   }
 
-  setState(nextState) {
+  setState(update) {
     const prevState = { ...this.state };
-    this.state = { ...this.state, ...nextState };
+    const nextState = typeof update === "function" ? update(prevState) : update;
+    this.state = { ...prevState, ...nextState };
+
     this.render();
     this._runEffects(prevState);
   }
