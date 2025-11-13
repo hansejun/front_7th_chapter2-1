@@ -121,7 +121,6 @@ export class HomePage extends Component {
     }
 
     if (this.state.error) {
-      console.log(this.state.error);
       return html`<div data-component="home-page-error-fallback"></div>`;
     }
 

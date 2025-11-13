@@ -1,9 +1,9 @@
-import { Component } from "../../core/component/Component";
-import { formatPrice } from "../../utils/format";
+import { Component } from "../../../core/component/Component";
+import { formatPrice } from "../../../utils/format";
 
 export class ProductDetailCard extends Component {
   template() {
-    const { image, title, rating, reviewCount, lprice, stock, description } = this.props;
+    const { image, title, rating, reviewCount, lprice, stock, description } = this.props.product;
 
     return html`
       <div class="bg-white rounded-lg shadow-sm mb-6">
