@@ -1,5 +1,4 @@
-import { Component } from "../../core/component/Component";
-import { html } from "../../utils/html";
+import { Component } from "../../../core/component/Component";
 
 export class HomePageErrorFallback extends Component {
   setup() {

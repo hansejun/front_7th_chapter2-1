@@ -1,4 +1,4 @@
-import { formatPrice } from "../../utils/format";
+import { formatPrice } from "../../../utils/format";
 
 export function ProductCard({ product }) {
   const productPrice = formatPrice(product.lprice);

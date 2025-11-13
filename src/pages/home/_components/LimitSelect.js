@@ -1,4 +1,4 @@
-import { Component } from "../../core/component/Component";
+import { Component } from "../../../core/component/Component";
 
 export class LimitSelect extends Component {
   setEvents() {

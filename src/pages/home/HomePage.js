@@ -1,17 +1,17 @@
-import { CategoryFilter } from "../../components/filter/CategoryFilter";
-import { LimitSelect } from "../../components/filter/LimitSelect";
-import { SearchBar } from "../../components/filter/SearchBar";
-import { SortSelect } from "../../components/filter/SortSelect";
+import { CategoryFilter } from "./_components/CategoryFilter";
+import { LimitSelect } from "./_components/LimitSelect";
+import { SearchBar } from "./_components/SearchBar";
+import { SortSelect } from "./_components/SortSelect";
 import { Component } from "../../core/component/Component";
-import { HomePageLoadingFallback } from "./HomePageLoadingFallback";
+import { HomePageLoadingFallback } from "./_components/HomePageLoadingFallback";
 import { html } from "../../utils/html";
-import { ProductList } from "../../components/product/ProductList";
+import { ProductList } from "./_components/ProductList";
 import { cartStore } from "../../stores/cart-store";
 import { searchParamsStore } from "../../stores/search-params-store";
 
 import { IntersectionObserverWrapper } from "../../core/IntersectionObserver";
 import { HomeViewModel } from "./HomeViewModel";
-import { HomePageErrorFallback } from "./HomePageErrorFallback";
+import { HomePageErrorFallback } from "./_components/HomePageErrorFallback";
 
 export class HomePage extends Component {
   setup() {
@@ -68,10 +68,6 @@ export class HomePage extends Component {
     super.render();
     this.observeSentinel();
     this.renderComponents();
-  }
-
-  unmount() {
-    super.unmount();
   }
 
   renderComponents() {

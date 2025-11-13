@@ -1,5 +1,5 @@
-import { Component } from "../../core/component/Component";
-import { useNavigate } from "../../hooks/useNavigate";
+import { Component } from "../../../core/component/Component";
+import { useNavigate } from "../../../hooks/useNavigate";
 import { ProductCard } from "./ProductCard";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 
