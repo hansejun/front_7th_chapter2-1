@@ -3,7 +3,7 @@ import { formatPrice } from "../../../utils/format";
 
 export class ProductDetailCard extends Component {
   template() {
-    const { image, title, rating, reviewCount, lprice, stock, description } = this.props.product;
+    const { image, title, rating, reviewCount, lprice, stock, description, brand } = this.props.product;
 
     return html`
       <div class="bg-white rounded-lg shadow-sm mb-6">
@@ -14,7 +14,7 @@ export class ProductDetailCard extends Component {
           </div>
           <!-- 상품 정보 -->
           <div>
-            <p class="text-sm text-gray-600 mb-1"></p>
+            <p class="text-sm text-gray-600 mb-1">${brand}</p>
             <h1 class="text-xl font-bold text-gray-900 mb-3">${title}</h1>
 
             <!-- 평점 및 리뷰 -->
